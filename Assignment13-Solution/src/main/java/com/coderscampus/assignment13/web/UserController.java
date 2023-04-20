@@ -69,6 +69,14 @@ public class UserController {
 	public String postOneUser (@PathVariable Long userId, User user) {
 		User existingUser = userService.findByIdWithAccounts(userId);
 		user.setAccounts(existingUser.getAccounts());
+		if (existingUser.getAddress() == null) {
+			Address newAddress = user.getAddress();
+			newAddress.setUser(existingUser);
+			newAddress.setUserId(user.getUserId());
+			existingUser.setAddress(newAddress);
+			userService.saveUser(existingUser);
+			return "redirect:/users/"+user.getUserId();
+		}
 		Address address = addressService.save(user.getAddress());
 		user.setAddress(address);
 		userService.saveUser(user);
